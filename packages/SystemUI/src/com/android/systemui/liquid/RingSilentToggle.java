@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.android.systemui.carbon;
-
-import com.android.systemui.statusbar.WidgetView;
+package com.android.systemui.liquid;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.provider.Settings;
 
 /*
- * Toggle the NavBar
+ * Toggle Ring/Vibrate/Silent
  */
 
-public class WidgetToggle extends Activity  {
-  public WidgetToggle() {
+public class RingSilentToggle extends Activity  {
+  public RingSilentToggle() {
     super();
   }
 
@@ -40,9 +42,19 @@ public class WidgetToggle extends Activity  {
   @Override
   public void onResume() {
     super.onResume();
-    Intent toggleWidgets = new Intent(
-            WidgetView.WidgetReceiver.ACTION_TOGGLE_WIDGETS);
-    sendBroadcast(toggleWidgets);
-    this.finish();
+
+    AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+    if(am != null){
+      if(am.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
+        am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+      }else{
+        am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, (int)(ToneGenerator.MAX_VOLUME * 0.85));
+        if(tg != null){
+          tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+        }
+      }
+    }
+    finish();
   }
 }
