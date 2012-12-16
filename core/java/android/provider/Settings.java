@@ -3893,7 +3893,6 @@ public final class Settings {
         public static final String WIFI_WATCHDOG_PING_TIMEOUT_MS =
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
 
-<<<<<<< HEAD
         /**
          * Navigation bar alpha while in homescreen and lockscreen.
          *
@@ -3927,9 +3926,15 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_ALPHA_CONFIG = "status_bar_alpha_config";
-=======
 
->>>>>>> bfd34bc... QuickSettings: allow custom ordering and what toggles are visible/hidden
+        /**
+         * @hide
+         * Show Wifi network name in notification shade
+         * 0 - don't show
+         * 1 - show
+         */
+        public static final String NOTIFICATION_SHOW_WIFI_SSID = "notification_show_wifi_ssid";
+
     }
 
     /**
