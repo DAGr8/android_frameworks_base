@@ -1515,7 +1515,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     }
 
     protected void updateCarrierAndWifiLabelVisibility(boolean force) {
-	if (!mShowCarrierInPanel || mCarrierAndWifiView == null) return;
+        if (!mShowCarrierInPanel || mCarrierAndWifiView == null) return;
 
         if (DEBUG) {
             Slog.d(TAG, String.format("pileh=%d scrollh=%d carrierh=%d",
@@ -1527,7 +1527,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             !(emergencyCallsShownElsewhere && mNetworkController.isEmergencyOnly())
             && mPile.getHeight() < (mNotificationPanel.getHeight() - mCarrierAndWifiViewHeight - mNotificationHeaderHeight - calculateCarrierLabelBottomMargin())
             && mScrollView.getVisibility() == View.VISIBLE;
-        
+
         if (force || mCarrierAndWifiViewVisible != makeVisible) {
             mCarrierAndWifiViewVisible = makeVisible;
             if (DEBUG) {
@@ -1536,18 +1536,16 @@ public class PhoneStatusBar extends BaseStatusBar {
             mCarrierAndWifiView.animate().cancel();
             if (makeVisible) {
                 mCarrierAndWifiView.setVisibility(View.VISIBLE);
-            }
-            mCarrierAndWifiView.animate()
+             }
+             mCarrierAndWifiView.animate()
                 .alpha(makeVisible ? 1f : 0f)
-                //.setStartDelay(makeVisible ? 500 : 0)
-                //.setDuration(makeVisible ? 750 : 100)
                 .setDuration(150)
                 .setListener(makeVisible ? null : new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         if (!mCarrierAndWifiViewVisible) { // race
                             mCarrierAndWifiView.setVisibility(View.INVISIBLE);
-                            mCarrierAndWifiView.animate().alpha(0f);
+                            mCarrierAndWifiView.setAlpha(0f);
                         }
                     }
                 })
@@ -2089,6 +2087,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             mScrollView.setScaleX(-progress);
             mPowerWidget.updateVisibility();
             mNotificationButton.setVisibility(View.GONE);
+            updateCarrierAndWifiLabelVisibility(true);
         } else { // settings side
             mFlipSettingsView.setScaleX(progress);
             mFlipSettingsView.setVisibility(View.VISIBLE);
@@ -2098,6 +2097,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             mPowerWidget.setVisibility(View.GONE);
             mNotificationButton.setVisibility(View.VISIBLE);
             mNotificationButton.setAlpha(progress);
+            updateCarrierAndWifiLabelVisibility(false);
         }
         mClearButton.setVisibility(View.GONE);
     }
