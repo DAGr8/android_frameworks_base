@@ -54,9 +54,9 @@ import android.widget.LinearLayout;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.systemui.R;
 import com.android.systemui.TransparencyManager;
-import com.android.systemui.carbon.CarbonTarget;
-import com.android.systemui.statusbar.policy.ExtensibleKeyButtonView;
 import com.android.systemui.statusbar.policy.KeyButtonView;
+import com.android.systemui.statusbar.policy.key.ExtensibleKeyButtonView;
+import com.android.systemui.statusbar.policy.key.RecentsKeyButtonView;
 
 public class NavigationBarView extends LinearLayout {
     final static boolean DEBUG = false;
@@ -89,8 +89,8 @@ public class NavigationBarView extends LinearLayout {
     
     public DelegateViewHelper mDelegateHelper;
     private BaseStatusBar mBar;
-
-    private CarbonTarget mCarbonTarget;
+    private SettingsObserver mSettingsObserver;
+    private Context mContext;
 
     // workaround for LayoutTransitions leaving the nav buttons in a weird state (bug 5549288)
     final static boolean WORKAROUND_INVALID_LAYOUT = true;
@@ -117,21 +117,21 @@ public class NavigationBarView extends LinearLayout {
 
     public final static int StockButtonsQty = 3;
     public final static String[] StockClickActions = {
-        CarbonTarget.ACTION_BACK,
-        CarbonTarget.ACTION_HOME,
-        CarbonTarget.ACTION_RECENTS,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL };
+        AwesomeConstant.ACTION_BACK.value(),
+        AwesomeConstant.ACTION_HOME.value(),
+        AwesomeConstant.ACTION_RECENTS.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value() };
     public final static String[] StockLongpress = {
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL,
-        CarbonTarget.ACTION_NULL };
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value(),
+        AwesomeConstant.ACTION_NULL.value() };
 
     FrameLayout rot0;
     FrameLayout rot90;
@@ -258,11 +258,8 @@ public class NavigationBarView extends LinearLayout {
         mShowMenu = false;
         mDelegateHelper = new DelegateViewHelper(this);
 
-        mBackIcon = res.getDrawable(R.drawable.ic_sysbar_back);
-        mBackLandIcon = res.getDrawable(R.drawable.ic_sysbar_back_land);
-        mBackAltIcon = res.getDrawable(R.drawable.ic_sysbar_back_ime);
-        mBackAltLandIcon = res.getDrawable(R.drawable.ic_sysbar_back_ime);
-        mCarbonTarget = new CarbonTarget(context);
+        mBackIcon = NavBarHelpers.getIconImage(mContext, AwesomeConstant.ACTION_BACK.value());
+        mBackAltIcon = ((KeyButtonView)generateKey(false, KEY_BACK_ALT)).getDrawable();
     }
 
     public void setTransparencyManager(TransparencyManager tm) {
@@ -295,7 +292,6 @@ public class NavigationBarView extends LinearLayout {
                         mLongpressActions[j],
                         mPortraitIcons[j]);
                 v.setTag((landscape ? "key_land_" : "key_") + j);
-                v.setCarbonTarget(mCarbonTarget);
                 iconUri = mPortraitIcons[j];
                 if (iconUri != null && iconUri.length() > 0) {
                     // custom icon from the URI here
@@ -304,7 +300,8 @@ public class NavigationBarView extends LinearLayout {
                         v.setImageDrawable(new BitmapDrawable(getResources(), f.getAbsolutePath()));
                     }
                 } else {
-                        v.setImageDrawable(mCarbonTarget.getIconImage(mClickActions[j]));
+                    v.setImageDrawable(NavBarHelpers.getIconImage(mContext, mClickActions[j]));
+                    v.setTint(mClickActions[j].startsWith("**") || mColorAllIcons);
                 }
                 addButton(navButtonLayout, v, landscape && !mLeftyMode);
                 // if we are in LeftyMode, then we want to add to end, like Portrait
@@ -454,8 +451,13 @@ public class NavigationBarView extends LinearLayout {
             String iconUri) {
 
         final int iconSize = 80;
-        ExtensibleKeyButtonView v = new ExtensibleKeyButtonView(mContext, null, clickAction,
+        ExtensibleKeyButtonView v = null;
+        if(AwesomeAction.ACTION_RECENTS.equals(clickAction)) {
+            v = new RecentsKeyButtonView(mContext, null, clickAction, longpress);
+        } else {
+            v = new ExtensibleKeyButtonView(mContext, null, clickAction,
                 longpress);
+        }
         v.setLayoutParams(getLayoutParams(landscape, iconSize));
         v.setGlowBackground(landscape ? R.drawable.ic_sysbar_highlight_land
                 : R.drawable.ic_sysbar_highlight);
