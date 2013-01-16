@@ -588,6 +588,10 @@
     <!-- Label in drop down to identify brightness slider -->
     <string name="brightness_label">Brightness</string>
 
+    <!--  Quick Settings -->
+    <string name="quick_settings_navbar_hide_on_label">NavBar Hide On</string>
+    <string name="quick_settings_navbar_hide_off_label">NavBAr Hide Off</string>
+
     <!-- Recents Ram Bar -->
     <string name="memory">RAM</string>
     <!-- [CHAR LIMIT=10] Running services, summary of background processes -->
