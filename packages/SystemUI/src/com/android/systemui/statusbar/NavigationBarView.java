@@ -87,6 +87,7 @@ public class NavigationBarView extends LinearLayout {
     int mNavigationIconHints = 0;
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon;
     private boolean mMenuArrowKeys;
+    private boolean mColorAllIcons;
     
     public DelegateViewHelper mDelegateHelper;
     private BaseStatusBar mBar;
@@ -152,6 +153,7 @@ public class NavigationBarView extends LinearLayout {
     public static final int KEY_MENU_LEFT = 5;
     public static final int KEY_ARROW_LEFT = 21; // pretty cute right
     public static final int KEY_ARROW_RIGHT = 22;
+    public static final int KEY_BACK_ALT = 1000;
 
 
 
@@ -301,6 +303,7 @@ public class NavigationBarView extends LinearLayout {
                     if (f.exists()) {
                         v.setImageDrawable(new BitmapDrawable(getResources(), f.getAbsolutePath()));
                     }
+                    v.setTint(mColorAllIcons);
                 } else {
                     v.setImageDrawable(NavBarHelpers.getIconImage(mContext, mClickActions[j]));
                     v.setTint(mClickActions[j].startsWith("**") || mColorAllIcons);
@@ -310,9 +313,9 @@ public class NavigationBarView extends LinearLayout {
                 addLightsOutButton(lightsOut, v, landscape && !mLeftyMode, false);
 
                 if (v.getId() == R.id.back){
-                	mBackIcon = mBackLandIcon = v.getDrawable();
+                    mBackIcon = mBackLandIcon = v.getDrawable();
                 }
-                if (v.getId() == R.id.menu){
+                if (v.getId() == R.id.navbar_menu_big){
                     mHasBigMenuButton = true;
                 }
                 if (mNumberOfButtons == 3 && j != (mNumberOfButtons - 1)) {
@@ -323,27 +326,21 @@ public class NavigationBarView extends LinearLayout {
                     addLightsOutButton(lightsOut, separator, landscape, true);
                 }
             }
-            // check to see if we already have a menu button
-            if (!mHasBigMenuButton) {  // don't add menu buttons if we already have one
+            if (mMenuLocation != SHOW_DONT) {
                 // add left menu
-                if (mMenuLocation != SHOW_DONT) {
-                    View leftMenuKey = generateKey(landscape, KEY_MENU_LEFT);
+                View leftMenuKey = generateKey(landscape, KEY_MENU_LEFT);
                     // since we didn't add these at the beginning, we need to insert it now
                     // the behavior is backwards from landscape (ie, insert at beginning
                     // if portrait, add to end if landscape
-                    addButton(navButtonLayout, leftMenuKey, !landscape || (landscape && mLeftyMode));
-                    addLightsOutButton(lightsOut, leftMenuKey, !landscape || (landscape && mLeftyMode), true);
-
-                    View rightMenuKey = generateKey(landscape, KEY_MENU_RIGHT);
-                    addButton(navButtonLayout, rightMenuKey, landscape && !mLeftyMode);
-                    addLightsOutButton(lightsOut, rightMenuKey, landscape && !mLeftyMode, true);
-                }
-            } else {
-                // there's a big menu button.
-                if(mMenuArrowKeys) {
+                addButton(navButtonLayout, leftMenuKey, !landscape || (landscape && mLeftyMode));
+                addLightsOutButton(lightsOut, leftMenuKey, !landscape || (landscape && mLeftyMode), true);
+             // add right menu
+                View rightMenuKey = generateKey(landscape, KEY_MENU_RIGHT);
+                addButton(navButtonLayout, rightMenuKey, landscape && !mLeftyMode);
+                addLightsOutButton(lightsOut, rightMenuKey, landscape && !mLeftyMode, true);
+            } else if(mMenuArrowKeys) {
                     addButton(navButtonLayout, generateKey(landscape, KEY_ARROW_LEFT), !landscape);
                     addButton(navButtonLayout, generateKey(landscape, KEY_ARROW_RIGHT), landscape);
-                 }
             }
         }
         Drawable bg = mContext.getResources().getDrawable(R.drawable.nav_bar_bg);
@@ -402,6 +399,7 @@ public class NavigationBarView extends LinearLayout {
                 v.setContentDescription(r.getString(R.string.accessibility_menu));
                 v.setGlowBackground(landscape ? R.drawable.ic_sysbar_highlight_land
                         : R.drawable.ic_sysbar_highlight);
+                v.setTint(true);
                 break;
             case KEY_MENU_LEFT:
                 v = new KeyButtonView(mContext, null);
@@ -420,6 +418,7 @@ public class NavigationBarView extends LinearLayout {
                 v.setContentDescription(r.getString(R.string.accessibility_menu));
                 v.setGlowBackground(landscape ? R.drawable.ic_sysbar_highlight_land
                         : R.drawable.ic_sysbar_highlight);
+                v.setTint(true);
                 break;
             case KEY_ARROW_LEFT:
                 v = new KeyButtonView(mContext, null);
@@ -431,6 +430,7 @@ public class NavigationBarView extends LinearLayout {
                         : R.drawable.ic_sysbar_highlight);
                 v.setVisibility(View.GONE);
                 v.setSupportsLongPress(true);
+                v.setTint(true);
                 break;
             case KEY_ARROW_RIGHT:
                 v = new KeyButtonView(mContext, null);
@@ -442,12 +442,20 @@ public class NavigationBarView extends LinearLayout {
                         : R.drawable.ic_sysbar_highlight);
                 v.setVisibility(View.GONE);
                 v.setSupportsLongPress(true);
+                v.setTint(true);
                 break;
+            case KEY_BACK_ALT:
+                v = new KeyButtonView(mContext, null);
+                v.setLayoutParams(getLayoutParams(landscape, 80));
+                v.setImageResource(R.drawable.ic_sysbar_back_ime);
+                v.setGlowBackground(landscape ? R.drawable.ic_sysbar_highlight_land
+                        : R.drawable.ic_sysbar_highlight);
+                v.setTint(true);
         }
 
         return v;
     }
-    
+
     private ExtensibleKeyButtonView generateKey(boolean landscape, String clickAction,
             String longpress,
             String iconUri) {
@@ -625,10 +633,10 @@ public class NavigationBarView extends LinearLayout {
 
     public void setMenuVisibility(final boolean show, final boolean force) {
 
-    	if (!force && mShowMenu == show)
+        if (!force && mShowMenu == show)
             return;
 
-        if ((mMenuLocation == SHOW_DONT) || mHasBigMenuButton) {
+        if (mMenuLocation == SHOW_DONT) {
             return;
         }
 
@@ -773,7 +781,7 @@ public class NavigationBarView extends LinearLayout {
 
     @Override
     public void onFinishInflate() {
-    	 rot0 = (FrameLayout) findViewById(R.id.rot0);
+         rot0 = (FrameLayout) findViewById(R.id.rot0);
          rot90 = (FrameLayout) findViewById(R.id.rot90);
 
          mRotatedViews[Surface.ROTATION_0] =
@@ -793,8 +801,21 @@ public class NavigationBarView extends LinearLayout {
          mCurrentView = mRotatedViews[Surface.ROTATION_0];
 
          // this takes care of making the buttons
-         SettingsObserver settingsObserver = new SettingsObserver(new Handler());
-         settingsObserver.observe();
+         mSettingsObserver = new SettingsObserver(new Handler());
+         updateSettings();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mSettingsObserver.observe();
+        updateSettings();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        mContext.getContentResolver().unregisterContentObserver(mSettingsObserver);
+        super.onDetachedFromWindow();
     }
 
     public void reorient() {
@@ -870,7 +891,7 @@ public class NavigationBarView extends LinearLayout {
                 if (rightArrow != null) {
                     rightArrow.setVisibility(View.VISIBLE);
                 }
-                if (!mHasBigMenuButton) {
+                if (mMenuLocation != SHOW_DONT) {
                     if (leftMenu != null) {
                         leftMenu.setCode(KeyEvent.KEYCODE_DPAD_LEFT);
                         leftMenu.setImageResource(R.drawable.ic_sysbar_ime_left);
@@ -892,7 +913,7 @@ public class NavigationBarView extends LinearLayout {
                 if (rightArrow != null) {
                     rightArrow.setVisibility(View.GONE);
                 }
-                if (!mHasBigMenuButton) {
+                if (mMenuLocation != SHOW_DONT) {
                     if (leftMenu != null && leftMenu.getCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
                         leftMenu.setCode(KeyEvent.KEYCODE_MENU);
                         leftMenu.setSupportsLongPress(false);
@@ -911,7 +932,7 @@ public class NavigationBarView extends LinearLayout {
                 if (rightArrow != null) {
                     rightArrow.setVisibility(View.INVISIBLE);
                 }
-                if (!mHasBigMenuButton) {
+                if (mMenuLocation != SHOW_DONT) {
                     if (leftMenu != null && leftMenu.getCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
                         leftMenu.setVisibility(View.INVISIBLE);
                     }
@@ -957,6 +978,8 @@ public class NavigationBarView extends LinearLayout {
 
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.NAVIGATION_BAR_COLOR), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.NAVIGATION_BAR_ALLCOLOR), false, this);
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.MENU_LOCATION), false,
                     this);
@@ -1025,6 +1048,8 @@ public class NavigationBarView extends LinearLayout {
                 Settings.System.MENU_LOCATION, SHOW_RIGHT_MENU);
         mNavigationBarColor = Settings.System.getInt(resolver,
                 Settings.System.NAVIGATION_BAR_COLOR, -1);
+        mColorAllIcons = Settings.System.getBoolean(resolver,
+                Settings.System.NAVIGATION_BAR_ALLCOLOR, false);
         mMenuVisbility = Settings.System.getInt(resolver,
                 Settings.System.MENU_VISIBILITY, VISIBILITY_SYSTEM);
         mMenuArrowKeys = Settings.System.getBoolean(resolver,
