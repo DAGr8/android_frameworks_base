@@ -3000,6 +3000,13 @@ public final class Settings {
          */
         public static final String EXPANDED_DESKTOP_MODE = "expanded_desktop_mode";
 
+
+        /**
+         * Restart Launcher
+         * @hide
+         */
+        public static final String EXPANDED_DESKTOP_RESTART_LAUNCHER = "expanded_desktop_restart_launcher";
+
         /**
          * Whether to use a separate delay for "slide to unlock" and security
          * lock
@@ -3323,6 +3330,18 @@ public final class Settings {
           * @hide
           */
          public static final String KEY_HOME_LONG_PRESS_ACTION = "key_home_long_press_action";
+          
+        /**
+         * Action to perform when the home key pressed. (Default is 1)
+         * @hide
+         */
+        public static final String KEY_HOME_ACTION = "key_home_action";
+
+        /**
+         * Action to perform when the back key is pressed. (Default is 2)
+         * @hide
+         */
+        public static final String KEY_BACK_ACTION = "key_back_action";
 
          /**
           * Action to perform when the menu key is pressed. (Default is 1)
@@ -3330,6 +3349,12 @@ public final class Settings {
           * @hide
           */
          public static final String KEY_MENU_ACTION = "key_menu_action";
+
+        /**
+         * Action to perform when the back key is long-pressed. (Default is 8)
+         * @hide
+         */
+        public static final String KEY_BACK_LONG_PRESS_ACTION = "key_back_long_press_action";
 
          /**
           * Action to perform when the menu key is long-pressed.
