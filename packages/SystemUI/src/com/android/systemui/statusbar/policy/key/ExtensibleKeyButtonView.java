@@ -6,9 +6,9 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 
-import static com.android.internal.util.carbon.AwesomeConstants.*;
+import static com.android.internal.util.liquid.AwesomeConstants.*;
 import com.android.systemui.R;
-import com.android.systemui.carbon.AwesomeAction;
+import com.android.systemui.liquid.AwesomeAction;
 import com.android.systemui.statusbar.policy.KeyButtonView;
 
 public class ExtensibleKeyButtonView extends KeyButtonView {

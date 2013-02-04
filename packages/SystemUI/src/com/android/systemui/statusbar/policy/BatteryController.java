@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.BatteryManager;
+import android.os.Handler;
+import android.provider.Settings;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -78,10 +80,6 @@ public class BatteryController extends BroadcastReceiver {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_BATTERY), false, this);
         }
-
-        @Override public void onChange(boolean selfChange) {
-            updateSettings();
-        }
     }
 
     private ArrayList<BatteryStateChangeCallback> mChangeCallbacks =
@@ -96,12 +94,10 @@ public class BatteryController extends BroadcastReceiver {
 
     public BatteryController(Context context) {
         mContext = context;
-
         mHandler = new Handler();
 
         SettingsObserver settingsObserver = new SettingsObserver(mHandler);
         settingsObserver.observe();
-        updateSettings();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
@@ -166,5 +162,5 @@ public class BatteryController extends BroadcastReceiver {
             cb.onBatteryLevelChanged(sBatteryLevel, sBatteryCharging);
         }
     }
->>>>>>> 79c266d... Toggle bug fixes
 }
+

@@ -61,6 +61,8 @@ public class CircleBattery extends ImageView {
     private boolean mActivated;     // whether or not activated due to system settings
     private boolean mPercentage;    // whether or not to show percentage number
     private boolean mIsCharging;    // whether or not device is currently charging
+    private boolean mBatteryPlugged;// whether or not battery is currently plugged
+    private int     mBatteryStatus; // current battery status
     private int     mLevel;         // current battery level
     private int     mAnimOffset;    // current level of charging animation
     private boolean mIsAnimating;   // stores charge-animation status to reliably remove callbacks
@@ -83,6 +85,12 @@ public class CircleBattery extends ImageView {
     private Paint   mPaintSystem;
     private Paint   mPaintRed;
     private int batteryStyle;
+
+    private int mCircleColor;
+    private int mBatteryStyle;
+    private int mCircleTextColor;
+    private int mCircleTextChargingColor;
+    private int mCircleAnimSpeed;
 
     private SettingsObserver mSettingsObserver;
 
@@ -190,6 +198,37 @@ public class CircleBattery extends ImageView {
         updateSettings();
     }
 
+    protected int getLevel() {
+        return mLevel;
+    }
+
+    protected int getBatteryStatus() {
+        return mBatteryStatus;
+    }
+
+    protected boolean isBatteryPlugged() {
+        return mBatteryPlugged;
+    }
+
+    protected boolean isBatteryPresent() {
+        return true;
+    }
+
+    private boolean isBatteryStatusUnknown() {
+        return getBatteryStatus() == BatteryManager.BATTERY_STATUS_UNKNOWN;
+    }
+
+    private boolean isBatteryStatusCharging() {
+        return getBatteryStatus() == BatteryManager.BATTERY_STATUS_CHARGING;
+    }
+
+    protected void onBatteryStatusChange(Intent intent) {
+        mLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+        mBatteryPlugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
+        mBatteryStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS,
+                                            BatteryManager.BATTERY_STATUS_UNKNOWN);
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -234,7 +273,7 @@ public class CircleBattery extends ImageView {
             usePaint = mPaintRed;
         }
         usePaint.setAntiAlias(true);
-        if (batteryStyle == BatteryController.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT) {
+        if (batteryStyle == BatteryController.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT ) {
             // change usePaint from solid to dashed
             usePaint.setPathEffect(new DashPathEffect(new float[]{3,2},0));
         }else {
@@ -304,7 +343,6 @@ public class CircleBattery extends ImageView {
 
         mActivated = (mBatteryStyle == BatteryController.BATTERY_STYLE_CIRCLE ||
                       mBatteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT ||
-                      mBatteryStyle == BatteryController.BATTERY_STYLE_DOTTED_CIRCLE ||
                       mBatteryStyle == BatteryController.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT);
         mPercentage = (mBatteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT ||
                        mBatteryStyle == BatteryController.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT);

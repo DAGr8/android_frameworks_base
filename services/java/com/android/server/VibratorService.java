@@ -151,15 +151,6 @@ public class VibratorService extends IVibratorService.Stub
                     }
                 }, UserHandle.USER_ALL);
 
-        mContext.getContentResolver().registerContentObserver(
-                Settings.System.getUriFor(Settings.System.VIBRATION_MULTIPLIER), true,
-                new ContentObserver(mH) {
-                    @Override
-                    public void onChange(boolean selfChange) {
-                        updateVibrationMultiplier();
-                    }
-                }, UserHandle.USER_ALL);
-
         mContext.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -169,12 +160,7 @@ public class VibratorService extends IVibratorService.Stub
 
         updateInputDeviceVibrators();
     }
-    void updateVibrationMultiplier() {
-        vibrationMultiplier = Settings.System.getFloat(
-                            mContext.getContentResolver(),
-                            Settings.System.VIBRATION_MULTIPLIER, 1);
-    }
-	
+
     public boolean hasVibrator() {
         return doVibratorExists();
     }
@@ -207,8 +193,6 @@ public class VibratorService extends IVibratorService.Stub
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires VIBRATE permission");
         }
-
-    	long milliseconds = (long)(millis * vibrationMultiplier);
         int uid = Binder.getCallingUid();
         // We're running in the system server so we cannot crash. Check for a
         // timeout of 0 or negative. This will ensure that a vibration has
@@ -247,7 +231,6 @@ public class VibratorService extends IVibratorService.Stub
         if (inQuietHours()) {
             return;
         }
-
         int uid = Binder.getCallingUid();
         // so wakelock calls will succeed
         long identity = Binder.clearCallingIdentity();

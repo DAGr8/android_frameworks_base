@@ -313,14 +313,7 @@ public class NavigationBarView extends LinearLayout {
                 addLightsOutButton(lightsOut, v, landscape && !mLeftyMode, false);
 
                 if (v.getId() == R.id.back){
-<<<<<<< HEAD
-                    mBackIcon = mBackLandIcon = v.getDrawable();
-                }
-                if (v.getId() == R.id.navbar_menu_big){
-                    mHasBigMenuButton = true;
-=======
                 	mBackIcon = v.getDrawable();
->>>>>>> 3621a77... FW : Rework NavBar UI in ROMControl.
                 }
                 if (mNumberOfButtons == 3 && j != (mNumberOfButtons - 1)) {
                     // add separator view here
