@@ -5,9 +5,9 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.view.View;
 
-import static com.android.internal.util.aokp.AwesomeConstants.*;
+import static com.android.internal.util.liquid.AwesomeConstants.*;
 import com.android.systemui.R;
-import com.android.systemui.aokp.AwesomeAction;
+import com.android.systemui.liquid.AwesomeAction;
 
 public class SilentToggle extends StatefulToggle {
     private AudioManager mAudioManager;
