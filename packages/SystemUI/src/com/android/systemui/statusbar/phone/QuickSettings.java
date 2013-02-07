@@ -492,7 +492,7 @@ class QuickSettings {
                 quick.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mBar.collapseAllPanels(true);
+                        getService().animateCollapsePanels();
                         final UserManager um =
                                 (UserManager) mContext.getSystemService(Context.USER_SERVICE);
                         if (um.getUsers(true).size() > 1) {
@@ -610,7 +610,7 @@ class QuickSettings {
                 quick.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mBar.collapseAllPanels(true);
+                        getService().animateCollapsePanels();
                         showBrightnessDialog();
                     }
                 });
@@ -1256,7 +1256,7 @@ class QuickSettings {
                         Settings.System.QUICK_TOGGLE_FAV_CONTACT);
 
                         if (lookupKey != null && lookupKey.length() > 0) {
-                            mBar.collapseAllPanels(true);
+                            getService().animateCollapsePanels();
                             Uri lookupUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
                             Uri res = ContactsContract.Contacts.lookupContact(mContext.getContentResolver(), lookupUri);
                             Intent intent = ContactsContract.QuickContact.composeQuickContactsIntent(
