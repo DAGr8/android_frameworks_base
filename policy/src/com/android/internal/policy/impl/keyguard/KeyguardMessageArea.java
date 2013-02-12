@@ -230,9 +230,9 @@ class KeyguardMessageArea extends TextView {
             // Battery status
             if (mPluggedIn) {
                 // Charging, charged or waiting to charge.
-                string = getContext().getString(mBatteryCharged ?
-                        com.android.internal.R.string.lockscreen_charged
-                        :com.android.internal.R.string.lockscreen_plugged_in, mBatteryLevel);
+                string = getContext().getString(mBatteryCharged
+                        ? com.android.internal.R.string.lockscreen_charged
+                        : com.android.internal.R.string.lockscreen_plugged_in, mBatteryLevel);
                 icon.value = CHARGING_ICON;
             } else if (mBatteryIsLow) {
                 // Battery is low

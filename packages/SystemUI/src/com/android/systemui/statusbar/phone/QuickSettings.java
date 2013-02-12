@@ -255,6 +255,7 @@ class QuickSettings {
         connManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mBluetoothState = new QuickSettingsModel.BluetoothState();
+
         mHandler = new Handler();
 
         mLiquidTarget = new LiquidTarget(mContext);
@@ -493,8 +494,7 @@ class QuickSettings {
                                 (UserManager) mContext.getSystemService(Context.USER_SERVICE);
                         if (um.getUsers(true).size() > 1) {
                             try {
-                                WindowManagerGlobal.getWindowManagerService().lockNow(
-                                        LockPatternUtils.USER_SWITCH_LOCK_OPTIONS);
+                                WindowManagerGlobal.getWindowManagerService().lockNow(null);
                             } catch (RemoteException e) {
                                 Log.e(TAG, "Couldn't show user switcher", e);
                             }

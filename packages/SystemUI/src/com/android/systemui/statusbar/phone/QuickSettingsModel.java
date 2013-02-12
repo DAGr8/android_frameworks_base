@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothAdapter.BluetoothStateChangeCallback;
 import android.content.BroadcastReceiver;
@@ -46,6 +47,7 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
@@ -148,7 +150,8 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         public void startObserving() {
             final ContentResolver cr = mContext.getContentResolver();
             cr.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.NEXT_ALARM_FORMATTED), false, this);
+                    Settings.System.getUriFor(Settings.System.NEXT_ALARM_FORMATTED), false, this,
+                    UserHandle.USER_ALL);
         }
     }
 
@@ -200,6 +203,8 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private final BugreportObserver mBugreportObserver;
     private final BrightnessObserver mBrightnessObserver;
     private NfcAdapter mNfcAdapter;
+
+    private final boolean mHasMobileData;
 
     private QuickSettingsTileView mUserTile;
     private RefreshCallback mUserCallback;
@@ -331,6 +336,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mBugreportObserver.startObserving();
         mBrightnessObserver = new BrightnessObserver(mHandler);
         mBrightnessObserver.startObserving();
+
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        mHasMobileData = cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
 
         IntentFilter alarmIntentFilter = new IntentFilter();
         alarmIntentFilter.addAction(Intent.ACTION_ALARM_CHANGED);
@@ -478,8 +487,15 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
 
     void onNextAlarmChanged() {
-        mAlarmState.label = Settings.System.getString(mContext.getContentResolver(),
-                Settings.System.NEXT_ALARM_FORMATTED);
+        final String alarmText = Settings.System.getStringForUser(mContext.getContentResolver(),
+                Settings.System.NEXT_ALARM_FORMATTED,
+                UserHandle.USER_CURRENT);
+        mAlarmState.label = alarmText;
+
+        // When switching users, this is the only clue we're going to get about whether the
+        // alarm is actually set, since we won't get the ACTION_ALARM_CHANGED broadcast
+        mAlarmState.enabled = ! TextUtils.isEmpty(alarmText);
+
         mAlarmCallback.refreshView(mAlarmTile, mAlarmState);
     }
 
@@ -586,6 +602,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mWifiCallback.refreshView(mWifiTile, mWifiState);
     }
 
+    boolean deviceHasMobileData() {
+        return mHasMobileData;
+    }
+
     // RSSI
     void addRSSITile(QuickSettingsTileView view, RefreshCallback cb) {
         mRSSITile = view;
@@ -603,7 +623,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     public void onMobileDataSignalChanged(
             boolean enabled, int mobileSignalIconId, String signalContentDescription,
             int dataTypeIconId, String dataContentDescription, String enabledDesc) {
-        if (deviceSupportsTelephony()) {
+        if (deviceHasMobileData()) {
             // TODO: If view is in awaiting state, disable
             Resources r = mContext.getResources();
             mRSSIState.signalIconId = enabled && (mobileSignalIconId > 0)
