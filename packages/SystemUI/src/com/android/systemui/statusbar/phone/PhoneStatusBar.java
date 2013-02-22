@@ -34,7 +34,6 @@ import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -239,6 +238,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     View mFlipSettingsView;
     QuickSettingsContainerView mSettingsContainer;
     int mSettingsPanelGravity;
+    private NotifChangedObserver mNotifChangedObserver;
 
     // top bar
     View mNotificationPanelHeader;
@@ -800,37 +800,40 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
 
         mWifiLabel = (TextView)mStatusBarWindow.findViewById(R.id.wifi_text);
-        mNetworkController.addWifiLabelView(mWifiLabel);
 
-        mWifiLabel.addTextChangedListener(new TextWatcher() {
+        if (mWifiLabel != null) {
+            mNetworkController.addWifiLabelView(mWifiLabel);
 
-            public void afterTextChanged(Editable s) {
-            }
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-            }
-            public void onTextChanged(CharSequence s, int start, int before,
-                    int count) {
-                 if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.NOTIFICATION_SHOW_WIFI_SSID, 0) == 1 &&
-                        count > 0) {
-                    mWifiView.setVisibility(View.VISIBLE);
+            mWifiLabel.addTextChangedListener(new TextWatcher() {
+
+                public void afterTextChanged(Editable s) {
                 }
-                else
-                {
-                    mWifiView.setVisibility(View.GONE);
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                        int after) {
                 }
-            }
+                public void onTextChanged(CharSequence s, int start, int before,
+                        int count) {
+                    if (Settings.System.getInt(mContext.getContentResolver(),
+                            Settings.System.NOTIFICATION_SHOW_WIFI_SSID, 0) == 1 &&
+                            count > 0) {
+                        mWifiView.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        mWifiView.setVisibility(View.GONE);
+                    }
+                }
 
-        });
+            });
 
-        // set up the dynamic hide/show of the labels
-        mPile.setOnSizeChangedListener(new OnSizeChangedListener() {
-            @Override
-            public void onSizeChanged(View view, int w, int h, int oldw, int oldh) {
-                updateCarrierAndWifiLabelVisibility(false);
-            }
-        });
+            // set up the dynamic hide/show of the labels
+            mPile.setOnSizeChangedListener(new OnSizeChangedListener() {
+                @Override
+                public void onSizeChanged(View view, int w, int h, int oldw, int oldh) {
+                    updateCarrierAndWifiLabelVisibility(false);
+                }
+            });
+        }
 
         // Set notification background
         setNotificationWallpaperHelper();
@@ -879,6 +882,10 @@ public class PhoneStatusBar extends BaseStatusBar {
                 mQS = null; // fly away, be free
             }
         }
+
+        // Start observing for changes on Notification Drawer (Background & Alpha)
+        mNotifChangedObserver = new NotifChangedObserver(mHandler);
+        mNotifChangedObserver.startObserving();
 
         mClingShown = ! (DEBUG_CLINGS
             || !Prefs.read(mContext).getBoolean(Prefs.SHOWN_QUICK_SETTINGS_HELP, false));
@@ -1446,6 +1453,8 @@ public class PhoneStatusBar extends BaseStatusBar {
             mPile.removeView(remove);
         }
 
+        //set alpha for notification pile before it is added
+        setNotificationAlphaHelper();
         for (int i=0; i<toShow.size(); i++) {
             View v = toShow.get(i);
             if (v.getParent() == null) {
@@ -1506,6 +1515,8 @@ public class PhoneStatusBar extends BaseStatusBar {
     }
 
     protected void updateCarrierAndWifiLabelVisibility(boolean force) {
+	if (!mShowCarrierInPanel || mCarrierAndWifiView == null) return;
+
         if (DEBUG) {
             Slog.d(TAG, String.format("pileh=%d scrollh=%d carrierh=%d",
                     mPile.getHeight(), mScrollView.getHeight(), mCarrierAndWifiViewHeight));
@@ -3242,6 +3253,35 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
     }
 
+    /**
+     * ContentObserver to watch for Notification background/alpha
+     * @author dvtonder
+     * @author kufikugel
+     */
+    private class NotifChangedObserver extends ContentObserver {
+        public NotifChangedObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            setNotificationWallpaperHelper();
+            setNotificationAlphaHelper();
+        }
+
+        public void startObserving() {
+            final ContentResolver cr = mContext.getContentResolver();
+
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.NOTIF_WALLPAPER_ALPHA),
+                    false, this);
+
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.NOTIF_ALPHA),
+                    false, this);
+        }
+    }
+
     private void setNotificationWallpaperHelper() {
         float wallpaperAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_WALLPAPER_ALPHA, 0.1f);
         String notifiBack = Settings.System.getString(mContext.getContentResolver(), Settings.System.NOTIFICATION_BACKGROUND);
@@ -3255,6 +3295,20 @@ public class PhoneStatusBar extends BaseStatusBar {
                 background.setColorFilter(Integer.parseInt(notifiBack), Mode.SRC_ATOP);
             }
          background.setAlpha((int) ((1-wallpaperAlpha) * 255));
+        }
+    }
+
+    private void setNotificationAlphaHelper() {
+        float notifAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_ALPHA, 0.0f);
+        if (mPile != null) {
+            int N = mNotificationData.size();
+            for (int i=0; i<N; i++) {
+              Entry ent = mNotificationData.get(N-i-1);
+              View expanded = ent.expanded;
+              if (expanded !=null && expanded.getBackground()!=null) expanded.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+              View large = ent.getLargeView();
+              if (large != null && large.getBackground()!=null) large.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+            }
         }
     }
 
