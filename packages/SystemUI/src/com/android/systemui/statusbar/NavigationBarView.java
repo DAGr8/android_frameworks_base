@@ -51,6 +51,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import static com.android.internal.util.carbon.AwesomeConstants.*;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.systemui.R;
 import com.android.systemui.TransparencyManager;
@@ -245,6 +246,7 @@ public class NavigationBarView extends LinearLayout {
     public NavigationBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        mContext = context;
         mHidden = false;
 
         mDisplay = ((WindowManager)context.getSystemService(
@@ -452,7 +454,7 @@ public class NavigationBarView extends LinearLayout {
 
         final int iconSize = 80;
         ExtensibleKeyButtonView v = null;
-        if(AwesomeAction.ACTION_RECENTS.equals(clickAction)) {
+        if(clickAction.equals(AwesomeConstant.ACTION_RECENTS)) {
             v = new RecentsKeyButtonView(mContext, null, clickAction, longpress);
         } else {
             v = new ExtensibleKeyButtonView(mContext, null, clickAction,
