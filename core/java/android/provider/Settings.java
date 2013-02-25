@@ -3057,6 +3057,13 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_AUTO_ROTATE = "lockscreen_auto_rotate";
+  
+         /**
+         * Electronic beam animation mode
+         * 0 = always horizontal, 1 = always vertical, 2 = dependent on orientation
+         * @hide
+         */
+        public static final String SYSTEM_POWER_CRT_MODE = "system_power_crt_mode";
 
         /**
          * custom lockscreen text color
@@ -3572,6 +3579,7 @@ public final class Settings {
         public static final String DRAG_HANDLE_WEIGHT = "drag_handle_weight";
 
         /**
+         * Whether electronic beam animation is enabled or not
          * @hide
          */
         public static final String DRAG_HANDLE_OPACITY = "drag_handle_opacity";
