@@ -1555,8 +1555,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mHasSoftInput = hasSoftInput;
                 updateRotation = true;
             }
-<<<<<<< HEAD
-=======
 
             // Update navigation bar dimensions
             boolean expanded = Settings.System.getInt(mContext.getContentResolver(),
@@ -1596,7 +1594,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                                 mContext.getResources().getDimensionPixelSize(
                                         com.android.internal.R.dimen.navigation_bar_width));
             }
->>>>>>> c7df421... fix IME overlapping fields while typing in certain situations
         }
         if (updateRotation) {
             updateRotation(true);
@@ -2629,10 +2626,50 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (Settings.Secure.getInt(mContext.getContentResolver(),
-                    Settings.Secure.KILL_APP_LONGPRESS_BACK, 0) == 1) {
-                if (down && repeatCount == 0) {
-                    mHandler.postDelayed(mBackLongPress, mBackKillTimeout);
+            if (down) {
+                if (!mRecentAppsPreloaded && (mPressOnBackBehavior.equals(getStr(KEY_ACTION_APP_SWITCH)) ||
+                        mLongPressOnBackBehavior.equals(getStr(KEY_ACTION_APP_SWITCH)))) {
+                    preloadRecentApps();
+                }
+                if (repeatCount == 0) {
+                    mBackLongPressed = false;
+                    if (!mPressOnBackBehavior.equals(getStr(KEY_ACTION_BACK)) &&
+                            !mIsVirtualKeypress && event.getDeviceId() != KeyCharacterMap.VIRTUAL_KEYBOARD) {
+                        mBackDoCustomAction = true;
+                        return -1;
+                    }
+                } else if (longPress) {
+                    if (mRecentAppsPreloaded &&
+                            !mLongPressOnBackBehavior.equals(getStr(KEY_ACTION_APP_SWITCH))) {
+                        cancelPreloadRecentApps();
+                    }
+                    if (!keyguardOn && !mLongPressOnBackBehavior.equals(getStr(KEY_ACTION_NOTHING))) {
+                        performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
+                        performKeyAction(mLongPressOnBackBehavior);
+                        // Do not perform action when key is released
+                        mBackDoCustomAction = false;
+                        mBackLongPressed = true;
+                    }
+                }
+                if (mBackLongPressed) {
+                    return -1;
+                }
+            } else {
+                if (mRecentAppsPreloaded && !mPressOnBackBehavior.equals(getStr(KEY_ACTION_APP_SWITCH)) &&
+                        !mLongPressOnBackBehavior.equals(getStr(KEY_ACTION_APP_SWITCH))) {
+                    cancelPreloadRecentApps();
+                }
+                if (mBackLongPressed) {
+                    mBackLongPressed = false;
+                    return -1;
+                } else {
+                    if (mBackDoCustomAction) {
+                        mBackDoCustomAction = false;
+                        if (!canceled && !keyguardOn) {
+                            performKeyAction(mPressOnBackBehavior);
+                            return -1;
+                        }
+                    }
                 }
             }
         }
