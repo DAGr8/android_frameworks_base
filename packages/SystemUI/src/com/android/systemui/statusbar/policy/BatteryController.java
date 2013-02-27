@@ -23,13 +23,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.BatteryManager;
-<<<<<<< HEAD
-import android.os.Handler;
-import android.provider.Settings;
-import android.util.Slog;
-import android.view.View;
-=======
->>>>>>> 79c266d... Toggle bug fixes
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -66,9 +59,12 @@ public class BatteryController extends BroadcastReceiver {
     private static final int BATTERY_TEXT_STYLE_NORMAL  = R.string.status_bar_settings_battery_meter_format;
     private static final int BATTERY_TEXT_STYLE_MIN     = R.string.status_bar_settings_battery_meter_min_format;
 
-    private boolean mBatteryPlugged = false;
+
+    private int mLevel = 0;
     private int mBatteryStyle;
-    private int mBatteryIcon = BATTERY_ICON_STYLE_NORMAL;
+    private int mTextColor = -2;
+    private boolean mBatteryPlugged = false;
+    private int mBatteryStatus = BatteryManager.BATTERY_STATUS_UNKNOWN;
 
     Handler mHandler;
 
@@ -128,9 +124,6 @@ public class BatteryController extends BroadcastReceiver {
         final String action = intent.getAction();
         if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
             final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-<<<<<<< HEAD
-            mBatteryPlugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
-=======
             final int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS,
                     BatteryManager.BATTERY_STATUS_UNKNOWN);
 
@@ -144,7 +137,6 @@ public class BatteryController extends BroadcastReceiver {
 
             final int icon = plugged ? R.drawable.stat_sys_battery_charge
                     : R.drawable.stat_sys_battery;
->>>>>>> 79c266d... Toggle bug fixes
 
             int N = mIconViews.size();
             for (int i = 0; i < N; i++) {
@@ -165,51 +157,6 @@ public class BatteryController extends BroadcastReceiver {
         }
     }
 
-<<<<<<< HEAD
-            for (BatteryStateChangeCallback cb : mChangeCallbacks) {
-                cb.onBatteryLevelChanged(level, mBatteryPlugged);
-            }
-            updateBattery();
-        }
-    }
-
-    private void updateBattery() {
-        int mIcon = View.GONE;
-        int mText = View.GONE;
-        int mIconStyle = BATTERY_ICON_STYLE_NORMAL;
-
-        if (mBatteryStyle == BATTERY_STYLE_NORMAL) {
-            mIcon = (View.VISIBLE);
-            mIconStyle = mBatteryPlugged ? BATTERY_ICON_STYLE_CHARGE
-                    : BATTERY_ICON_STYLE_NORMAL;
-        } else if (mBatteryStyle == BATTERY_STYLE_PERCENT) {
-            mIcon = (View.VISIBLE);
-            mText = (View.VISIBLE);
-            mIconStyle = mBatteryPlugged ? BATTERY_ICON_STYLE_CHARGE_MIN
-                    : BATTERY_ICON_STYLE_NORMAL_MIN;
-        }
-
-        int N = mIconViews.size();
-        for (int i=0; i<N; i++) {
-            ImageView v = mIconViews.get(i);
-            v.setVisibility(mIcon);
-            v.setImageResource(mIconStyle);
-        }
-        N = mLabelViews.size();
-        for (int i=0; i<N; i++) {
-            TextView v = mLabelViews.get(i);
-            v.setVisibility(mText);
-        }
-    }
-
-    private void updateSettings() {
-        ContentResolver resolver = mContext.getContentResolver();
-
-        mBatteryStyle = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_BATTERY, 0));
-        updateBattery();
-    }
-=======
     public void updateCallback(BatteryStateChangeCallback cb) {
         cb.onBatteryLevelChanged(sBatteryLevel, sBatteryCharging);
     }
