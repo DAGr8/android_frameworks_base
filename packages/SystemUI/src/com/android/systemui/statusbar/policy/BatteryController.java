@@ -16,9 +16,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import java.util.ArrayList;
-
-import android.bluetooth.BluetoothAdapter.BluetoothStateChangeCallback;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,14 +23,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.BatteryManager;
+<<<<<<< HEAD
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Slog;
 import android.view.View;
+=======
+>>>>>>> 79c266d... Toggle bug fixes
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 public class BatteryController extends BroadcastReceiver {
     private static final String TAG = "StatusBar.BatteryController";
@@ -93,6 +95,9 @@ public class BatteryController extends BroadcastReceiver {
         public void onBatteryLevelChanged(int level, boolean pluggedIn);
     }
 
+    private static int sBatteryLevel = 50;
+    private static boolean sBatteryCharging = false;
+
     public BatteryController(Context context) {
         mContext = context;
 
@@ -123,22 +128,44 @@ public class BatteryController extends BroadcastReceiver {
         final String action = intent.getAction();
         if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
             final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+<<<<<<< HEAD
             mBatteryPlugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
+=======
+            final int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS,
+                    BatteryManager.BATTERY_STATUS_UNKNOWN);
+
+            boolean plugged = false;
+            switch (status) {
+                case BatteryManager.BATTERY_STATUS_CHARGING:
+                case BatteryManager.BATTERY_STATUS_FULL:
+                    plugged = true;
+                    break;
+            }
+
+            final int icon = plugged ? R.drawable.stat_sys_battery_charge
+                    : R.drawable.stat_sys_battery;
+>>>>>>> 79c266d... Toggle bug fixes
 
             int N = mIconViews.size();
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 ImageView v = mIconViews.get(i);
                 v.setImageLevel(level);
                 v.setContentDescription(mContext.getString(R.string.accessibility_battery_level,
                         level));
             }
             N = mLabelViews.size();
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 TextView v = mLabelViews.get(i);
                 v.setText(mContext.getString(BATTERY_TEXT_STYLE_MIN,
                         level));
             }
+            sBatteryLevel = level;
+            sBatteryCharging = plugged;
+            updateCallbacks();
+        }
+    }
 
+<<<<<<< HEAD
             for (BatteryStateChangeCallback cb : mChangeCallbacks) {
                 cb.onBatteryLevelChanged(level, mBatteryPlugged);
             }
@@ -182,4 +209,15 @@ public class BatteryController extends BroadcastReceiver {
                 Settings.System.STATUS_BAR_BATTERY, 0));
         updateBattery();
     }
+=======
+    public void updateCallback(BatteryStateChangeCallback cb) {
+        cb.onBatteryLevelChanged(sBatteryLevel, sBatteryCharging);
+    }
+
+    public void updateCallbacks() {
+        for (BatteryStateChangeCallback cb : mChangeCallbacks) {
+            cb.onBatteryLevelChanged(sBatteryLevel, sBatteryCharging);
+        }
+    }
+>>>>>>> 79c266d... Toggle bug fixes
 }
