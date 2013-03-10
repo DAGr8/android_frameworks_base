@@ -4077,11 +4077,14 @@ public final class Settings {
         /**
          * Navigation bar color.
          *
+<<<<<<< HEAD
          * @hide
          */
         public static final String NAVIGATION_BAR_COLOR = "navigation_bar_color";
 
         /**
+=======
+>>>>>>> 3621a77... FW : Rework NavBar UI in ROMControl.
          * @hide
          */
         public static final String NAVIGATION_BAR_ALPHA_CONFIG = "navigation_bar_alpha_config";
