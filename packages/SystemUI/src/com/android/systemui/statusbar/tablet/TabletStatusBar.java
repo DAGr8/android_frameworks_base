@@ -637,7 +637,7 @@ public class TabletStatusBar extends BaseStatusBar implements
                ObjectAnimator.ofFloat(null, "alpha", 1f, 0f));
         xition.setDuration(LayoutTransition.DISAPPEARING, LIGHTS_GOING_OUT_SYSBAR_DURATION);
         xition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
-        ((ViewGroup)sb.findViewById(R.id.bar_contents_holder)).setLayoutTransition(xition);
+        ((ViewGroup)sb.findViewById(R.id.bar_contents)).setLayoutTransition(xition);
 
         xition = new LayoutTransition();
         xition.setAnimator(LayoutTransition.APPEARING,
