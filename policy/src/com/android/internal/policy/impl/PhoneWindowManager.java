@@ -1611,8 +1611,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 com.android.internal.R.bool.config_showNavigationBar) ? 1 : 0;
         boolean showNavBarNow = Settings.System.getInt(resolver,
                 Settings.System.NAVIGATION_BAR_SHOW, showByDefault) == 1;
+        if (showNavBarNow) {// let's force the NavBar to 'Show' status
+            showNavBarNow = true;
+        }
         if (mHasNavigationBar != showNavBarNow) {
             mHasNavigationBar = showNavBarNow;
+            resetScreenHelper();
+        }
+        if (mUserUIMode != Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.USER_UI_MODE,mStockUIMode)) {
             resetScreenHelper();
         }
     }
