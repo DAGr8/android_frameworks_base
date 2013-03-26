@@ -2627,18 +2627,6 @@ public final class Settings {
          */
 
         /**
-         * User selected UI Mode
-         * @hide
-         */
-        public static final String USER_UI_MODE = "user_ui_mode";
-
-        /**
-         * Current UI Mode
-         * @hide
-         */
-        public static final String CURRENT_UI_MODE = "current_ui_mode";
-
-        /**
          * Whether the UI is in tablet UI
          * @hide
          */
@@ -2863,6 +2851,25 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_LONG_BACK_ACTION = "lockscreen_long_back_action";
+        /**
+         * Current UI Mode
+         * 
+         *  0 = Phone UI
+         *  1 = Tablet UI
+         *  2 = Phablet UI
+         *  @hide
+         */
+        public static final String CURRENT_UI_MODE = "current_ui_mode";
+
+        /**
+         * User selected UI Mode
+         * 
+         *  0 = Phone UI
+         *  1 = Tablet UI
+         *  2 = Phablet UI
+         *  @hide
+         */
+        public static final String USER_UI_MODE = "user_ui_mode";
 
         /**
          * Action for long-pressing home button on lock screen
@@ -2991,9 +2998,20 @@ public final class Settings {
         public static final String NAVIGATION_BAR_WIDTH_PORT = "navigation_bar_width_port";
 
         /**
+        *
+        * @hide
+        */
+        public static final String NAVIGATION_BAR_WIDTH_LAND = "navigation_bar_width_land";
+
+        /**
          * @hide
          */
-        public static final String NAVIGATION_BAR_WIDTH_LAND = "navigation_bar_width_land";
+        public static final String NAV_HIDE_TIMEOUT = "nav_hide_timeout";
+
+        /**
+         * @hide
+         */
+        public static final String NAV_HIDE_ENABLE = "nav_hide_enable";
 
         /**
          * @hide
