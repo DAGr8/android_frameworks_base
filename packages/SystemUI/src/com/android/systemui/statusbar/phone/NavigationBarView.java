@@ -85,10 +85,12 @@ public class NavigationBarView extends LinearLayout {
     boolean mVertical;
     boolean mScreenOn;
 
+    private boolean mNavBarAutoHide = false;
+    private boolean isRotating = false;
+
     boolean mHidden, mLowProfile, mShowMenu;
     int mDisabledFlags = 0;
     int mNavigationIconHints = 0;
-
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon;
     
     private DelegateViewHelper mDelegateHelper;
@@ -971,6 +973,9 @@ public class NavigationBarView extends LinearLayout {
                     Settings.System.getUriFor(Settings.System.NAVIGATION_BAR_BUTTONS_QTY), false,
                     this);
 
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAV_HIDE_ENABLE), false, this);
+					
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.NAVIGATION_BAR_TINT), false,
                     this);
@@ -1031,6 +1036,9 @@ public class NavigationBarView extends LinearLayout {
         mCurrentUIMode = Settings.System.getInt(resolver,
                 Settings.System.CURRENT_UI_MODE,0);
 
+        mNavBarAutoHide = Settings.System.getBoolean(resolver,
+                Settings.System.NAV_HIDE_ENABLE, false);
+				
         mNavBarButtonColor = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.NAVIGATION_BAR_BUTTON_TINT, 0x00000000);
 
