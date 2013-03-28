@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import java.io.File;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
@@ -93,8 +95,8 @@ public class NavigationBarView extends LinearLayout {
     int mNavigationIconHints = 0;
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon;
     
-    private DelegateViewHelper mDelegateHelper;
-    private DeadZone mDeadZone;
+    public DelegateViewHelper mDelegateHelper;
+    private BaseStatusBar mBar;
 
     private SettingsObserver mSettingsObserver;
 
@@ -190,13 +192,11 @@ public class NavigationBarView extends LinearLayout {
 
     public void setBar(BaseStatusBar phoneStatusBar) {
         mDelegateHelper.setBar(phoneStatusBar);
+        mBar = phoneStatusBar;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mDeadZone != null && event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-            mDeadZone.poke(event);
-        }
         if (mDelegateHelper != null) {
             boolean ret = mDelegateHelper.onInterceptTouchEvent(event);
             if (ret) return true;
@@ -206,6 +206,9 @@ public class NavigationBarView extends LinearLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (mBar != null) {
+            mBar.onBarTouchEvent(event);
+        }
         return mDelegateHelper.onInterceptTouchEvent(event);
     }
 
@@ -630,7 +633,14 @@ public class NavigationBarView extends LinearLayout {
 
             }
         }
-
+        getSearchLight().setVisibility(isKeyguardEnabled() ? View.VISIBLE : View.GONE);
+        if (mNavBarAutoHide && !isRotating) {
+            if (isKeyguardEnabled())
+                mBar.setSearchLightOn(true);
+            else
+                mBar.setSearchLightOn(false);
+        }
+        isRotating = false;
         updateKeyguardAlpha();
     }
 
@@ -859,8 +869,6 @@ public class NavigationBarView extends LinearLayout {
             mCurrentView = mRotatedViews[rot];
         }
         mCurrentView.setVisibility(View.VISIBLE);
-
-        mDeadZone = (DeadZone) mCurrentView.findViewById(R.id.deadzone);
 
         // force the low profile & disabled states into compliance
         setLowProfile(mLowProfile, false, true /* force */);

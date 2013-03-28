@@ -1348,12 +1348,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         Settings.System.putInt(mContext.getContentResolver(),
                 Settings.System.CURRENT_UI_MODE, mUserUIMode);
-
-        if (mHasSystemNavBar) {
-            final int showByDefault = mContext.getResources().getBoolean(
-                    com.android.internal.R.bool.config_showNavigationBar) ? 1 : 0;
-            mHasNavigationBar = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.NAVIGATION_BAR_SHOW, showByDefault) == 1;
+        if (!mHasSystemNavBar) {
+             final boolean showByDefault = mContext.getResources().getBoolean(
+                     com.android.internal.R.bool.config_showNavigationBar);
+             mHasNavigationBar = Settings.System.getBoolean(mContext.getContentResolver(),
+                     Settings.System.NAVIGATION_BAR_SHOW, showByDefault);
 
             /*
              * at first boot up, we need to make sure navbar gets created
@@ -1362,8 +1361,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
              * if it was disabled by the user.
             */
             if (mNavBarFirstBootFlag) {
-                mHasNavigationBar = (showByDefault == 1);
                 mNavBarFirstBootFlag = false;
+             } else {
+                 mHasNavigationBar = mHasNavigationBar &&
+                         Settings.System.getBoolean(mContext.getContentResolver(),
+                                 Settings.System.NAVIGATION_BAR_SHOW, mHasNavigationBar);
+
             }
             // Allow a system property to override this. Used by the emulator.
             // See also hasNavigationBar().
@@ -1618,12 +1621,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         showByDefault = showByDefault || Settings.System.getBoolean(resolver,
                         Settings.System.NAVIGATION_BAR_SHOW, showByDefault);
         boolean showNavBarNow = Settings.System.getBoolean(resolver,
-                Settings.System.NAVIGATION_BAR_SHOW_NOW, showByDefault);
+                Settings.System.NAVIGATION_BAR_SHOW, showByDefault);
         boolean NavHide = Settings.System.getBoolean(resolver, Settings.System.NAV_HIDE_ENABLE, false);
         if (NavHide && !showNavBarNow) {// if we are autohiding, then let's force the NavBar to 'Show' status
             showNavBarNow = true;
             Settings.System.putBoolean(resolver,
-                    Settings.System.NAVIGATION_BAR_SHOW_NOW, showNavBarNow);
+                    Settings.System.NAVIGATION_BAR_SHOW, showNavBarNow);
         }
         int NavHeight = Settings.System.getInt(resolver,
                 Settings.System.NAVIGATION_BAR_HEIGHT, 0);

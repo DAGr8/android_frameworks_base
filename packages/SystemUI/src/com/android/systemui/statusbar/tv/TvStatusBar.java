@@ -94,7 +94,7 @@ public class TvStatusBar extends BaseStatusBar {
     }
 
     @Override
-    protected void onBarTouchEvent(MotionEvent ev) {
+    public void onBarTouchEvent(MotionEvent ev) {
     }
 
     @Override
@@ -102,7 +102,7 @@ public class TvStatusBar extends BaseStatusBar {
     }
 
     @Override
-    protected void setSearchLightOn(boolean on){
+    public void setSearchLightOn(boolean on){
     }
 
     @Override
