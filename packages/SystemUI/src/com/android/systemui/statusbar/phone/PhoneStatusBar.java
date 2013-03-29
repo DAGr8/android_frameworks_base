@@ -1128,8 +1128,6 @@ public class PhoneStatusBar extends BaseStatusBar {
         if (mWindowManager != null && !mAutoHideVisible){
             mWindowManager.removeView(mGesturePanel);
             mAutoHideVisible = true;
-            mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
-            repositionNavigationBar();
             if (mAutoHideTimeOut > 0) {
                 mHandler.postDelayed(delayHide, mAutoHideTimeOut);
             }
