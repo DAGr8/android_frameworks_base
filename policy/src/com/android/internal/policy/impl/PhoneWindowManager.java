@@ -675,7 +675,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_SHOW), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NAVIGATION_BAR_CAN_MOVE), false, this);
+                    Settings.System.NAVIGATION_BAR_SHOW_NOW), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.KEY_HOME_ACTION), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -1365,7 +1365,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
              } else {
                  mHasNavigationBar = mHasNavigationBar &&
                          Settings.System.getBoolean(mContext.getContentResolver(),
-                                 Settings.System.NAVIGATION_BAR_SHOW, mHasNavigationBar);
+                                 Settings.System.NAVIGATION_BAR_SHOW_NOW, mHasNavigationBar);
 
             }
             // Allow a system property to override this. Used by the emulator.
@@ -1458,11 +1458,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.VOLUME_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1);
             mVolBtnMusicControls = (Settings.System.getIntForUser(resolver,
                     Settings.System.VOLBTN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) == 1);
-
-            if (mShortSizeDp < 600) {
-                mNavigationBarCanMove = (Settings.System.getInt(resolver,
-                        Settings.System.NAVIGATION_BAR_CAN_MOVE, 1) == 1);
-            }
 
             boolean keyRebindingEnabled = Settings.System.getInt(resolver,
                     Settings.System.HARDWARE_KEY_REBINDING, 0) == 1;
@@ -1637,7 +1632,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (NavHide && !showNavBarNow) {// if we are autohiding, then let's force the NavBar to 'Show' status
             showNavBarNow = true;
             Settings.System.putBoolean(resolver,
-                    Settings.System.NAVIGATION_BAR_SHOW, showNavBarNow);
+                    Settings.System.NAVIGATION_BAR_SHOW_NOW, showNavBarNow);
         }
         int NavHeight = Settings.System.getInt(resolver,
                 Settings.System.NAVIGATION_BAR_HEIGHT, 0);
