@@ -472,8 +472,9 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         if (ENABLE_INTRUDERS) addIntruderView();
 
-        SettingsObserver observer = new SettingsObserver(mHandler);
-        observer.observe();
+		SettingsObserver settingsObserver = new SettingsObserver(new Handler());
+        settingsObserver.observe();
+        updateSettings();
 
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext);
@@ -1128,6 +1129,8 @@ public class PhoneStatusBar extends BaseStatusBar {
         if (mWindowManager != null && !mAutoHideVisible){
             mWindowManager.removeView(mGesturePanel);
             mAutoHideVisible = true;
+            mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
+            repositionNavigationBar();
             if (mAutoHideTimeOut > 0) {
                 mHandler.postDelayed(delayHide, mAutoHideTimeOut);
             }
