@@ -567,6 +567,10 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
 
         updateShowSearchHoldoff();
+		
+		SettingsObserver settingsObserver = new SettingsObserver(new Handler());
+        settingsObserver.observe();
+        updateSettings();
 
         try {
             boolean showNav = mWindowManagerService.hasNavigationBar();
@@ -634,9 +638,6 @@ public class PhoneStatusBar extends BaseStatusBar {
             mDateTimeView.setEnabled(true);
         }
 
-        SettingsObserver settingsObserver = new SettingsObserver(new Handler());
-        settingsObserver.observe();
-        updateSettings();
 
         mSettingsButton = (ImageView) mStatusBarWindow.findViewById(R.id.settings_button);
         if (mSettingsButton != null) {
