@@ -3008,6 +3008,12 @@ public final class Settings {
          */
         public static final String NAVIGATION_BAR_SHOW_NOW = "navigation_bar_show_now";
 
+	     /**
+         * Show the NavBar dialog in Power menu
+         * @hide
+         */
+        public static final String POWER_DIALOG_SHOW_NAVBAR_HIDE = "power_dialog_show_navbar_hide";
+
         /**
          * @hide
          */

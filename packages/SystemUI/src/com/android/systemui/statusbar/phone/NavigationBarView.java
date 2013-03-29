@@ -874,12 +874,10 @@ public class NavigationBarView extends LinearLayout {
         setLowProfile(mLowProfile, false, true /* force */);
         setDisabledFlags(mDisabledFlags, true /* force */);
         setMenuVisibility(mShowMenu, true /* force */);
-
+        setNavigationIconHints(mNavigationIconHints, true);
         if (DEBUG) {
             Slog.d(TAG, "reorient(): rot=" + mDisplay.getRotation());
         }
-
-        setNavigationIconHints(mNavigationIconHints, true);
     }
 
     @Override
