@@ -76,8 +76,8 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import static com.android.internal.util.carbon.AwesomeConstants.*;
-import com.android.internal.util.carbon.NavRingHelpers;
+import static com.android.internal.util.liquid.AwesomeConstants.*;
+import com.android.internal.util.liquid.NavRingHelpers;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.GlowPadView.OnTriggerListener;
 import com.android.internal.widget.multiwaveview.TargetDrawable;

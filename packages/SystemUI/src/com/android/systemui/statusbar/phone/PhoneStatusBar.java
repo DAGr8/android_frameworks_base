@@ -118,7 +118,7 @@ import com.android.systemui.statusbar.policy.NotificationRowLayout;
 import com.android.systemui.statusbar.policy.OnSizeChangedListener;
 import com.android.systemui.statusbar.policy.Prefs;
 import com.android.systemui.statusbar.powerwidget.PowerWidget;
-import com.android.systemui.carbon.AwesomeAction;
+import com.android.systemui.liquid.AwesomeAction;
 import com.android.systemui.statusbar.toggles.ToggleManager;
 
 import java.io.FileDescriptor;
@@ -231,10 +231,11 @@ public class PhoneStatusBar extends BaseStatusBar {
     TextView mNotificationPanelDebugText;
 
     // settings
+    ToggleManager mToggleManager;
 
-    QuickSettingsController mQS;
     boolean mHasSettingsPanel, mHideSettingsPanel, mHasFlipSettings;
     boolean mUiModeIsToggled;
+    int mToggleStyle;
     SettingsPanelView mSettingsPanel;
     View mFlipSettingsView;
     QuickSettingsContainerView mSettingsContainer;
@@ -663,15 +664,6 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         mUiModeIsToggled = Settings.Secure.getInt(mContext.getContentResolver(),
                               Settings.Secure.UI_MODE_IS_TOGGLED, 0) == 1;
-
-        if (mStatusBarView.hasFullWidthNotifications()) {
-            mHideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
-                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
-            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel) && !mHideSettingsPanel;
-        } else {
-            mHideSettingsPanel = false;
-            mHasSettingsPanel = res.getBoolean(R.bool.config_hasSettingsPanel);
-        }
 
         mHasFlipSettings = res.getBoolean(R.bool.config_hasFlipSettingsPanel);
 
@@ -3307,17 +3299,6 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         @Override
         public void onChange(boolean selfChange) {
-
-            boolean hideSettingsPanel = Settings.System.getInt(mContext.getContentResolver(),
-                                    Settings.System.QS_DISABLE_PANEL, 0) == 1;
-            boolean uiModeIsToggled = Settings.Secure.getInt(mContext.getContentResolver(),
-                                    Settings.Secure.UI_MODE_IS_TOGGLED, 0) == 1;
-
-            if (hideSettingsPanel != mHideSettingsPanel
-                || uiModeIsToggled != mUiModeIsToggled) {
-                recreateStatusBar();
-            }
-
             setNotificationWallpaperHelper();
             setNotificationAlphaHelper();
         }
